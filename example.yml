@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Prefix:
+    Type: String
+    Default: my-filter-example
+
+Resources:
+  MyExampleOutputQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600 # Max = 14 days
+      QueueName: !Sub "${Prefix}-filtered-output"
+      VisibilityTimeout: 30
+
+  MyExampleTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Prefix}-topic"
+
+  MyExampleOutputQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref MyExampleOutputQueue
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal: "*"
+            Action: sqs:SendMessage
+            Resource: !GetAtt MyExampleOutputQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref MyExampleTopic
+
+  MyExampleSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt MyExampleOutputQueue.Arn
+      Protocol: sqs
+      TopicArn: !Ref MyExampleTopic
+
+  MyExampleFilterPolicy:
+    Type: Custom::SNSSubscriptionFilterPolicy
+    Properties:
+      ServiceToken: !ImportValue SNSSetFilterPolicyServiceToken
+      Endpoint: !GetAtt MyExampleOutputQueue.Arn
+      TopicArn: !Ref MyExampleTopic
+      PolicyString: |-
+        {
+          "tag": ["rugby", "netball"]
+        }
+
+Outputs:
+  QueueUrl:
+    Value: !Ref MyExampleOutputQueue
+  TopicArn:
+    Value: !Ref MyExampleTopic
