@@ -1,5 +1,5 @@
 # cfn-sns-filter-policy
-A Cloudformation custom resource for setting an SNS filter policy
+A CloudFormation custom resource for setting an SNS filter policy
 
 ## Installation
 
@@ -50,16 +50,16 @@ And publish some messages:
 ```
 $ aws sns publish \
   --message Netball! \
-  --message-attributes '{"tag":{"DataType": "String","StringValue": "rugby"}}' \
   --topic-arn arn:aws:sns:...
+  --message-attributes '{"tag":{"DataType": "String","StringValue": "netball"}}' \
   aws sns publish \
   --message Dodgeball! \
   --message-attributes '{"tag":{"DataType": "String","StringValue": "dodgeball"}}' \
   --topic-arn arn:aws:sns:...
   aws sns publish \
   --message Rugby! \
-  --message-attributes '{"tag":{"DataType": "String","StringValue": "netball"}}' \
   --topic-arn arn:aws:sns:...
+  --message-attributes '{"tag":{"DataType": "String","StringValue": "rugby"}}' \
 ```
 
 You'll see how *only* messages matching our filter policy lands in the queue:
