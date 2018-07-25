@@ -44,7 +44,7 @@ Resources:
       TopicArn: !Ref MyExampleTopic
 
   MyExampleFilterPolicy:
-    Type: Custom::SNSSubscriptionFilterPolicy
+    Type: Custom::SNSSetFilterPolicy
     Properties:
       ServiceToken: !ImportValue SNSSetFilterPolicyServiceToken
       Endpoint: !GetAtt MyExampleOutputQueue.Arn
